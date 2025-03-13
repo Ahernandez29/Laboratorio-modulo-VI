@@ -1,0 +1,44 @@
+Practica 1 - Cifrado 1pts
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
+Descargue la herramiente gpg2, instalarla y configurarla 
+-----------------------------------------------------------------------
+
+En Rocky Linux viene instalada de forma predeterminada.
+
+------------------------------------------------------------------------
+
+
+Cree un directorio, y dentro un archivo y cifrelo utilizando gpg2
+-----------------------------------------------------------------------
+
+sudo mkdir directorio
+cd /directoio
+touch archivo1.txt 
+gpg -c archivo1.txt
+
+*Otra forma de cifrarlo
+
+-generar llaves
+
+gpg --generate-key
+
+seguir los pasos.
+
+gpg --encrypt archivo1.txt
+------------------------------------------------------------------------
+Intente acceder al archivo cifrado
+------------------------------------------------------------------------
+
+cat archivo1.txt.gpg
+
+----------------------------------------------------------------------
+Luego decifre el archivo y muestre el contenido del mismo
+----------------------------------------------------------------------
+
+gpg -d archivo1.txt.gpg
+
+* otra alternativa*
+
+gpg --decrypt archivo1.txt.gpg

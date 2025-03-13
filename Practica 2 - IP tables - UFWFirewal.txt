@@ -1,0 +1,52 @@
+Practica 2 - IP tables - UFW/Firewall-cmd
+--------------------------------------------------
+Habilite los servicios de http, ftp y ssh en el servidor, muentre ambos servicios funcionando de manera correcta.
+-----------------------------------------------------------------
+
+sudo systemctl enable --now httpd vsftpd sshd
+
+systemctl status sshd
+systemctl status vsftpd
+systemctl status sshd
+
+----------------------------------------------------------------------
+Utilizando IP tables bloquee el trafico del puerto 80, 21 y 22 para bloquear las conexiones hacia ambos servicios muestre los resultados.
+----------------------------------------------------------------------
+
+iptables -A INPUT -p tcp --dport 80 -j DROP
+  404  iptables -L
+  405  iptables -A INPUT -p tcp --dport 21 -j DROP
+  406  iptables -A INPUT -p tcp --dport 22 -j DROP
+  407  iptables -L
+----------------------------------------------------------------
+
+Utilizando IP tables habilite nuevamente el trafico del puerto 80, 21 y 22 para permitir las conexiones hacia ambos servicios.
+----------------------------------------------------------------------	iptables -D INPUT -p tcp --dport 80 -j DROP
+  412  iptables -D INPUT -p tcp --dport 21 -j DROP
+  413  iptables -D INPUT -p tcp --dport 22 -j DROP
+  414  iptables -L -v -n
+  415  iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+  416  iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+  417  iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+  418  iptables -L
+
+----------------------------------------------------------------------
+Utilizando ufw (si su distro es basada en debian) o firewall-cmd (si su distro esta basada en Red Hat) bloquee el trafico del puerto 80,21 y 22 para bloquear las conexiones hacia ambos servicios
+----------------------------------------------------------------------
+
+  420  firewall-cmd --remove-port=80/tcp --permanent
+  421  firewall-cmd --list-ports 
+  422  firewall-cmd --remove-port=21/tcp --permanent
+  423  firewall-cmd --remove-port=22/tcp --permanent
+  424  firewall-cmd --reload
+
+----------------------------------------------------------------------
+Habilite nuevamente el trafico del puerto 80, 21 y 22 para permitir las conexiones hacia ambos servicios.
+----------------------------------------------------------------------
+
+  426  firewall-cmd --add-port=80/tcp --permanent
+  427  firewall-cmd --add-port=21/tcp --permanent
+  428  firewall-cmd --add-port=22/tcp --permanent
+  429  firewall-cmd --reload
+  430  firewall-cmd --list-port
+
