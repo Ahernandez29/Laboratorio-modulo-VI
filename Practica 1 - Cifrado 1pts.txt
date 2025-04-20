@@ -42,3 +42,14 @@ gpg -d archivo1.txt.gpg
 * otra alternativa*
 
 gpg --decrypt archivo1.txt.gpg
+
+-------------------------------------------------------------------------
+FIRMAR UN ARCHIVO CON LA CLAVE PRIVADA, QUIEN TENGA LA CLAVE PUBLICA ASOCIADA PUEDE CONFIRMAR QUE ESE ARCHIVO FUE FIRMADO POR NOSOTROS:
+
+gpg --local-user yo@gmail.com --detach-sign archivo.txt
+
+Esto genera un archivo documento.txt.sig que contiene la firma y el documento original.
+
+-COMANDO PARA VERIFICAR SI EL ARCHIVO AUN CONSERVA SU INTEGRIDAD, AUTENTICIDAD Y NO REPUDIO:
+
+gpg --verify archivo.txt.sig
