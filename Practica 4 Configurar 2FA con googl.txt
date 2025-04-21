@@ -1,0 +1,70 @@
+Practica 4: Configurar 2FA con google authenticator Modulo PAM para Acceso SSH
+
+Instale y Configure Google Authenticator para el usuario que se utilizara para acceder via SSH
+Configure PAM para usar Google Authenticator
+Configure SSH para solicitar 2FA 
+Realize la demostraccion accediendo desde asu Maquina host hasta tu VM (si es exitoso, se te pedirá: Contraseña Código de Google Authenticator, ingrese los datos y el codigo enviado y acceda)
+*****************************************************************************************
+
+1: Instalación de Google Authenticator
+Desde la terminal de Rocky Linux:
+
+sudo dnf install google-authenticator qrencode -y
+
+Paquetes instalados:
+
+google-authenticator: Herramienta para generar tokens OTP.
+
+qrencode: Herramienta para generar códigos QR en la terminal.
+
+2: Generar el token de Google Authenticator
+Ejecuta el siguiente comando con el usuario que deseas proteger (por ejemplo, el usuario rockyuser):
+
+google-authenticator
+
+Te realizará algunas preguntas, debes responder de la siguiente forma recomendada:
+
+Luego obtendrás:
+
+Código QR (puedes escanearlo con la app móvil Google Authenticator o similar).
+
+Clave secreta (guárdala en un lugar seguro).
+
+3: Escanea el código QR
+Desde tu móvil, abre Google Authenticator o Microsoft Authenticator.
+
+Escanea el código QR generado o introduce manualmente la clave secreta.
+
+Verifica que se muestra correctamente un token temporal de 6 dígitos.
+
+4: Configurar PAM para Google Authenticator
+Edita el archivo PAM de SSH:
+
+sudo nano /etc/pam.d/sshd
+
+Añade la siguiente línea al principio del archivo:
+
+auth required pam_google_authenticator.so nullok
+
+required: Obligatorio para autenticarse.
+
+nullok: Usuarios sin configuración 2FA aún pueden acceder.
+
+ 5: Configurar el servidor SSH para usar PAM con Challenge-Response
+Edita el archivo de configuración SSH:
+
+sudo nano /etc/ssh/sshd_config
+
+Busca las siguientes líneas y asegúrate de que queden así:
+
+ChallengeResponseAuthentication yes
+UsePAM yes
+
+Opcional (recomendado): desactiva acceso root directo para mayor seguridad:
+
+PermitRootLogin no
+
+6: Reiniciar servicio SSH para aplicar cambios:
+
+sudo systemctl restart sshd
+
