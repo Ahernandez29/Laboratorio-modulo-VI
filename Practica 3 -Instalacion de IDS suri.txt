@@ -35,7 +35,7 @@ cd rules/
 
 - CREAR EL ARCHIVO DE CONFIGURACION DE LAS REGLAS:
 
-nano myrules
+nano myrules.rules
 
 - AGREGAR LAS REGLAS AL ARCHIVO:
 
@@ -58,7 +58,7 @@ sudo vi /etc/suricata/suricata.yaml
 
 -AL FINAL DEL ARCHIVO, DONDE DICE 'rule-files' AGREGAR EL NOMBRE DEL ARCHIVO DONDE SE CREARON LAS REGLAS ANTERIORMENTE:
 
-  - myrules
+  - myrules.rules
 
 -GUARDAR Y SALIR
 
