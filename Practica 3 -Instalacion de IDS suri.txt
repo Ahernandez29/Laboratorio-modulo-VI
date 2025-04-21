@@ -1,0 +1,129 @@
+Practica 3 -Instalacion de IDS suricata 1pts
+Descargue e instale el  IDS suricata (Apoyese de la documentacion oficial)
+luego de instalado, cree las siguientes reglas de deteccion de trafico:
+Detectar todo el trafico ICMP (Ping) hacia el host
+Detectar todo el trafico hacia el puerto 21/tcp de ese host
+Detectar todo el trafico hacia el puerto 22/tcp de ese host
+Detectar todo el trafico hacia el puerto 80/tcp de ese host
+Ejecute el IDS, Realize las pruebas desde su maquina host, y muestre como son detectadas por el IDS 
+
+************************************************************************
+
+0- INSTALAR LAS HERRAMIENTAS NECESARIAS:
+
+$ sudo dnf update
+
+sudo dnf install yum-utils nano curl wget policycoreutils-python-utils -y
+
+sudo dnf install -y epel-release dnf-plugins-core
+
+1- INSTALAR LA HERRAMIENTA SURICATA:
+
+sudo dnf install suricata -y
+
+2- CREAR LAS REGLAS Y CONFIGURAR EL ARCHIVO DE CONFIGURACION DE SURICATA:
+
+- CREAR LAS REGLAS:
+
+cd /var/lib/suricata/
+
+-CREAR LA CARPETA RULES LA CUAL GUARDARA EL ARCHIVO QUE TENDRA LAS REGLAS:
+
+mkdir rules
+
+cd rules/
+
+- CREAR EL ARCHIVO DE CONFIGURACION DE LAS REGLAS:
+
+nano myrules
+
+- AGREGAR LAS REGLAS AL ARCHIVO:
+
+alert icmp any any -> $HOME_NET any (msg:"ICMP Ping detected"; sid:10001;)
+alert tcp any any -> $HOME_NET 21 (msg:"Traffic to port 21 detected"; sid:10002;)
+alert tcp any any -> $HOME_NET 22 (msg:"Traffic to port 22 detected"; sid:10003;)
+alert tcp any any -> $HOME_NET 80 (msg:"Traffic to port 80 detected"; sid:10004;)
+
+**Estas reglas indican enviar una alerta cuando haya trafico en esos puertos***
+
+3- EDITAR EL ARCHIVO YAML DE SURICATA:
+
+sudo vi /etc/suricata/suricata.yaml
+
+-Localiza la línea # Community Flow ID y establece el valor de la variable community-id en true.
+
+-Seleccionar interfaz de red. El archivo de configuración predeterminado de Suricata inspecciona el tráfico en el dispositivo/interfaz de red eth0. Si tu servidor utiliza una interfaz de red diferente, tendrás que actualizarla en la configuración.
+
+-Busca la línea af-packet: alrededor de la línea número 580. Bajo ella, establece el valor de la variable interface al nombre del dispositivo de tu sistema.
+
+-AL FINAL DEL ARCHIVO, DONDE DICE 'rule-files' AGREGAR EL NOMBRE DEL ARCHIVO DONDE SE CREARON LAS REGLAS ANTERIORMENTE:
+
+  - myrules
+
+-GUARDAR Y SALIR
+
+4- HABILITAR SURICATA:
+
+ sudo systemctl enable suricata
+
+5- CONFIGURAR LOS PERMISOS DEL DIRECTORIO:
+
+Suricata creó automáticamente un usuario del sistema y un grupo llamado suricata durante el proceso de instalación. Necesitas dar los permisos de directorio adecuados para que la instalación funcione correctamente.
+
+Ejecuta el siguiente comando para establecer suricata como grupo para los directorios de Suricata.
+
+$ sudo chgrp -R suricata /etc/suricata
+$ sudo chgrp -R suricata /var/lib/suricata
+$ sudo chgrp -R suricata /var/log/suricata 
+
+Establece los permisos del grupo para lectura y escritura.
+
+$ sudo chmod -R g+r /etc/suricata/
+$ sudo chmod -R g+rw /var/lib/suricata
+$ sudo chmod -R g+rw /var/log/suricata
+
+6- AÑADIR EL USUARIO ACTUAL AL GRUPO SURICATA:
+Suricata creó automáticamente un usuario del sistema y un grupo llamado suricata durante el proceso de instalación. Añade tu usuario actual al grupo suricata para que puedas realizar operaciones directamente sin necesidad de sudo.
+
+$ sudo usermod -a -G suricata $USER
+
+7- CONFIGURAR LAS REGLAS DE SURICATA:
+
+Suricata, por defecto, sólo utiliza un conjunto limitado de reglas para detectar el tráfico de red. Puedes añadir más conjuntos de reglas de proveedores externos utilizando una herramienta llamada suricata-update. Ejecuta el siguiente comando para incluir reglas adicionales.
+
+suricata-update
+
+8- AÑADIR PROVEEDORES DE CONJUNTOS DE REGLAS:
+
+Puedes ampliar las reglas de Suricata añadiendo más proveedores. Puede obtener reglas de diversos proveedores gratuitos y comerciales.
+
+Puedes listar la lista de proveedores por defecto utilizando el siguiente comando.
+
+$ suricata-update list-sources
+
+9- VALIDAR LA CONFIGURACION DE SURICATA:
+Suricata incluye una herramienta de validación para comprobar si hay errores en el archivo de configuración y en las reglas. Ejecuta el siguiente comando para ejecutar la herramienta de validación.
+
+suricara -T -c /etc/suricata/suricata.yaml -v
+
+10- EJECUTAR SURICATA:
+
+sudo systemctl start suricata
+
+-COMPROBAR EL ESTADO DEL PROCESO:
+
+sudo systemctl status suricata
+
+11- COMANDO PARA HACER QUE SURICATA CAPTURE TODO EL TRAFICO EN LA INTERFAZ:
+
+sudo suricata -c /etc/suricata/suricata.yaml -i ens160
+
+12- COMANDO PARA VER TODAS LAS ALERTAS GENERADAS:
+
+sudo tail -f /var/log/suricata/fast.log
+
+13- PONER A PRUEBA:
+
+-desde otra maquina, hacer ping a la direccion ip que corre suricata.
+- ingresar desde el navegador a la direccion ip de la maquina que corre suricata.
+- desde otra maquina, tratar de ingresar mediante ssh a la maquina que corre ssh
